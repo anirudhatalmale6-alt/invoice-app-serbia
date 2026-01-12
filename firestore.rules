@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function to check if user exists in users collection
+    function isValidUser() {
+      return isAuthenticated() &&
+             exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    // Users collection - only authenticated users can read their own data
+    match /users/{userId} {
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      allow write: if false; // Only admin can create users via Admin SDK
+    }
+
+    // Invoices collection - authenticated users can CRUD
+    match /invoices/{invoiceId} {
+      allow read: if isValidUser();
+      allow create: if isValidUser();
+      allow update: if isValidUser();
+      allow delete: if isValidUser();
+    }
+
+    // Settings collection
+    match /settings/{settingId} {
+      allow read: if isValidUser();
+      allow write: if isValidUser();
+    }
+  }
+}
