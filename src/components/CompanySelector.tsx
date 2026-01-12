@@ -2,7 +2,7 @@ import React from 'react';
 import { useInvoices } from '../context/InvoiceContext';
 import '../styles/CompanySelector.css';
 
-const COMPANIES = ['Kompanija 1', 'Kompanija 2']; // Will be configurable
+const COMPANIES = ['Sirius Medical', 'S-Life'];
 
 const CompanySelector: React.FC = () => {
   const { selectedCompany, setSelectedCompany } = useInvoices();

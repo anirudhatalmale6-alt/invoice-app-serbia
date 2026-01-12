@@ -13,6 +13,17 @@ import { db } from '../services/firebase';
 import type { Invoice } from '../types';
 import { useAuth } from './AuthContext';
 
+// Helper function to get next working day
+const getNextWorkingDay = (date: Date): Date => {
+  const result = new Date(date);
+  result.setDate(result.getDate() + 1);
+  // Skip weekends (Saturday = 6, Sunday = 0)
+  while (result.getDay() === 0 || result.getDay() === 6) {
+    result.setDate(result.getDate() + 1);
+  }
+  return result;
+};
+
 interface InvoiceContextType {
   invoices: Invoice[];
   loading: boolean;
@@ -23,6 +34,7 @@ interface InvoiceContextType {
   deleteInvoice: (id: string) => Promise<void>;
   toggleStatus: (invoice: Invoice) => Promise<void>;
   getDueToday: () => Invoice[];
+  getDueTomorrow: () => Invoice[];
   getOverdue: () => Invoice[];
   searchBySupplier: (searchTerm: string) => Invoice[];
 }
@@ -107,6 +119,16 @@ export const InvoiceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     );
   };
 
+  // Get invoices due on the next working day (for reminder 1 working day before)
+  const getDueTomorrow = () => {
+    const today = new Date();
+    const nextWorkDay = getNextWorkingDay(today);
+    const nextWorkDayStr = nextWorkDay.toISOString().split('T')[0];
+    return getFilteredInvoices().filter(
+      inv => inv.datumDospeca === nextWorkDayStr && inv.status === 'neplaceno'
+    );
+  };
+
   const getOverdue = () => {
     const today = new Date().toISOString().split('T')[0];
     return getFilteredInvoices().filter(
@@ -131,6 +153,7 @@ export const InvoiceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     deleteInvoice,
     toggleStatus,
     getDueToday,
+    getDueTomorrow,
     getOverdue,
     searchBySupplier,
   };

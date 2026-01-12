@@ -10,7 +10,7 @@ interface Props {
   onClose: () => void;
 }
 
-const COMPANIES = ['Kompanija 1', 'Kompanija 2']; // Will be configurable
+const COMPANIES = ['Sirius Medical', 'S-Life'];
 
 const InvoiceForm: React.FC<Props> = ({ invoice, onClose }) => {
   const { addInvoice, updateInvoice } = useInvoices();

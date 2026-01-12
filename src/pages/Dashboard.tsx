@@ -10,14 +10,15 @@ import type { Invoice } from '../types';
 import '../styles/Dashboard.css';
 
 const Dashboard: React.FC = () => {
-  const { invoices, getDueToday, getOverdue, searchBySupplier, loading } = useInvoices();
+  const { invoices, getDueToday, getDueTomorrow, getOverdue, searchBySupplier, loading } = useInvoices();
   const { userData, signOut } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filter, setFilter] = useState<'all' | 'unpaid' | 'paid' | 'overdue' | 'today'>('all');
+  const [filter, setFilter] = useState<'all' | 'unpaid' | 'paid' | 'overdue' | 'today' | 'tomorrow'>('all');
 
   const dueToday = getDueToday();
+  const dueTomorrow = getDueTomorrow();
   const overdue = getOverdue();
 
   const getFilteredInvoices = () => {
@@ -32,6 +33,8 @@ const Dashboard: React.FC = () => {
         return overdue;
       case 'today':
         return dueToday;
+      case 'tomorrow':
+        return dueTomorrow;
       default:
         return filtered;
     }
@@ -72,6 +75,11 @@ const Dashboard: React.FC = () => {
 
       <div className="dashboard-stats">
         <DueTodayCard count={dueToday.length} />
+        <div className={`stat-card tomorrow ${dueTomorrow.length > 0 ? 'has-items' : ''}`}>
+          <span className="stat-number">{dueTomorrow.length}</span>
+          <span className="stat-label">Dospeva sutra</span>
+          {dueTomorrow.length > 0 && <span className="reminder-icon">🔔</span>}
+        </div>
         <div className="stat-card overdue">
           <span className="stat-number">{overdue.length}</span>
           <span className="stat-label">Istekle fakture</span>
@@ -100,6 +108,12 @@ const Dashboard: React.FC = () => {
             onClick={() => setFilter('today')}
           >
             Danas dospevaju
+          </button>
+          <button
+            className={filter === 'tomorrow' ? 'active' : ''}
+            onClick={() => setFilter('tomorrow')}
+          >
+            Sutra dospevaju
           </button>
           <button
             className={filter === 'overdue' ? 'active' : ''}

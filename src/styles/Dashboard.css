@@ -102,6 +102,26 @@
   border-left: 4px solid #f59e0b;
 }
 
+.stat-card.tomorrow {
+  border-left: 4px solid #8b5cf6;
+  position: relative;
+}
+
+.stat-card.tomorrow.has-items {
+  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+}
+
+.stat-card.tomorrow.has-items .stat-number {
+  color: #7c3aed;
+}
+
+.stat-card .reminder-icon {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 20px;
+}
+
 .stat-card.total {
   border-left: 4px solid #2563eb;
 }
