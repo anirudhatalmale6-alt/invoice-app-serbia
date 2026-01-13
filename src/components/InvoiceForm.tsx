@@ -1,8 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useInvoices } from '../context/InvoiceContext';
 import { performFieldOCR } from '../services/ocr';
 import type { FieldType } from '../services/ocr';
 import type { Invoice, Supplier } from '../types';
+import CameraScanner from './CameraScanner';
 import '../styles/InvoiceForm.css';
 
 interface Props {
@@ -12,10 +13,21 @@ interface Props {
 
 const COMPANIES = ['Sirius Medical', 'S-Life'];
 
+// Map field type to Serbian label
+const FIELD_LABELS: Record<FieldType, string> = {
+  dobavljac: 'Dobavljač',
+  pib: 'PIB',
+  brojFakture: 'Broj fakture',
+  iznos: 'Iznos',
+  datumPrometa: 'Datum prometa',
+  datumDospeca: 'Datum dospeća',
+  brojRacuna: 'Broj računa',
+};
+
 const InvoiceForm: React.FC<Props> = ({ invoice, onClose }) => {
   const { addInvoice, updateInvoice, getSupplierSuggestions, addOrUpdateSupplier, selectedCompany } = useInvoices();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeField, setActiveField] = useState<FieldType | null>(null);
+  const [showCamera, setShowCamera] = useState(false);
 
   // Default to selected company from header, or first company if "all" is selected
   const defaultCompany = selectedCompany === 'all' ? COMPANIES[0] : selectedCompany;
@@ -85,37 +97,40 @@ const InvoiceForm: React.FC<Props> = ({ invoice, onClose }) => {
   // Handle per-field OCR scanning
   const handleFieldScan = (fieldType: FieldType) => {
     setActiveField(fieldType);
-    fileInputRef.current?.click();
+    setShowCamera(true);
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // Handle captured image from camera
+  const handleCameraCapture = async (imageBlob: Blob) => {
+    setShowCamera(false);
+
+    if (!activeField) return;
 
     setIsProcessing(true);
     setOcrProgress(0);
     setError('');
 
     try {
-      if (activeField) {
-        // Single field OCR
-        const value = await performFieldOCR(file, activeField, setOcrProgress);
+      // Convert blob to File
+      const file = new File([imageBlob], 'scan.jpg', { type: 'image/jpeg' });
 
-        // Map field type to form field name
-        const fieldMapping: Record<FieldType, string> = {
-          dobavljac: 'dobavljac',
-          pib: 'pibDobavljaca',
-          brojFakture: 'brojFakture',
-          iznos: 'iznosZaPlacanje',
-          datumPrometa: 'datumPrometa',
-          datumDospeca: 'datumDospeca',
-          brojRacuna: 'brojRacunaZaUplatu',
-        };
+      // Single field OCR
+      const value = await performFieldOCR(file, activeField, setOcrProgress);
 
-        const formField = fieldMapping[activeField];
-        if (formField && value) {
-          setFormData(prev => ({ ...prev, [formField]: value }));
-        }
+      // Map field type to form field name
+      const fieldMapping: Record<FieldType, string> = {
+        dobavljac: 'dobavljac',
+        pib: 'pibDobavljaca',
+        brojFakture: 'brojFakture',
+        iznos: 'iznosZaPlacanje',
+        datumPrometa: 'datumPrometa',
+        datumDospeca: 'datumDospeca',
+        brojRacuna: 'brojRacunaZaUplatu',
+      };
+
+      const formField = fieldMapping[activeField];
+      if (formField && value) {
+        setFormData(prev => ({ ...prev, [formField]: value }));
       }
     } catch (err) {
       setError('Greška pri čitanju. Pokušajte ponovo ili unesite ručno.');
@@ -123,11 +138,12 @@ const InvoiceForm: React.FC<Props> = ({ invoice, onClose }) => {
       setIsProcessing(false);
       setOcrProgress(0);
       setActiveField(null);
-      // Reset file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
     }
+  };
+
+  const handleCameraClose = () => {
+    setShowCamera(false);
+    setActiveField(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -195,15 +211,6 @@ const InvoiceForm: React.FC<Props> = ({ invoice, onClose }) => {
             </div>
           </div>
         )}
-
-        <input
-          type="file"
-          ref={fileInputRef}
-          accept="image/*"
-          capture="environment"
-          onChange={handleFileUpload}
-          style={{ display: 'none' }}
-        />
 
         <form onSubmit={handleSubmit}>
           <div className="form-row">
@@ -372,6 +379,14 @@ const InvoiceForm: React.FC<Props> = ({ invoice, onClose }) => {
             </button>
           </div>
         </form>
+
+        {showCamera && activeField && (
+          <CameraScanner
+            onCapture={handleCameraCapture}
+            onClose={handleCameraClose}
+            fieldLabel={FIELD_LABELS[activeField]}
+          />
+        )}
       </div>
     </div>
   );
