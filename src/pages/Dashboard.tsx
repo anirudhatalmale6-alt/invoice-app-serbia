@@ -10,7 +10,7 @@ import type { Invoice } from '../types';
 import '../styles/Dashboard.css';
 
 const Dashboard: React.FC = () => {
-  const { invoices, getDueToday, getDueTomorrow, getOverdue, searchInvoices, loading } = useInvoices();
+  const { invoices, getDueToday, getDueTomorrow, getOverdue, searchInvoices, loading, selectedCompany } = useInvoices();
   const { userData, signOut } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
@@ -90,7 +90,10 @@ const Dashboard: React.FC = () => {
         </div>
         <div className="stat-card total">
           <span className="stat-number">{unpaidTotal.toLocaleString('sr-RS')} RSD</span>
-          <span className="stat-label">Ukupno za plaćanje</span>
+          <span className="stat-label">
+            Ukupno za plaćanje
+            {selectedCompany !== 'all' && <span className="company-indicator"> ({selectedCompany})</span>}
+          </span>
         </div>
       </div>
 
