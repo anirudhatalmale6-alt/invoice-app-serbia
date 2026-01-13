@@ -75,6 +75,9 @@ const InvoiceList: React.FC<Props> = ({ invoices, onEdit }) => {
               <td>
                 <div className="supplier-cell">
                   <span className="supplier-name">{invoice.dobavljac}</span>
+                  {invoice.brojRacunaZaUplatu && (
+                    <span className="bank-account">Račun: {invoice.brojRacunaZaUplatu}</span>
+                  )}
                   {invoice.kompanija && (
                     <span className="company-tag">{invoice.kompanija}</span>
                   )}
@@ -127,6 +130,9 @@ const InvoiceList: React.FC<Props> = ({ invoices, onEdit }) => {
 
             <div className="card-body">
               <div className="supplier">{invoice.dobavljac}</div>
+              {invoice.brojRacunaZaUplatu && (
+                <div className="bank-account">Račun: {invoice.brojRacunaZaUplatu}</div>
+              )}
               <span className="company-tag">{invoice.kompanija}</span>
 
               <div className="card-details">

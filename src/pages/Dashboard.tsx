@@ -10,7 +10,7 @@ import type { Invoice } from '../types';
 import '../styles/Dashboard.css';
 
 const Dashboard: React.FC = () => {
-  const { invoices, getDueToday, getDueTomorrow, getOverdue, searchBySupplier, loading } = useInvoices();
+  const { invoices, getDueToday, getDueTomorrow, getOverdue, searchInvoices, loading } = useInvoices();
   const { userData, signOut } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
@@ -22,7 +22,7 @@ const Dashboard: React.FC = () => {
   const overdue = getOverdue();
 
   const getFilteredInvoices = () => {
-    let filtered = searchTerm ? searchBySupplier(searchTerm) : invoices;
+    let filtered = searchTerm ? searchInvoices(searchTerm) : invoices;
 
     switch (filter) {
       case 'unpaid':

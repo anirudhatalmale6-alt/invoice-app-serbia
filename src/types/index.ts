@@ -3,6 +3,7 @@ export interface Invoice {
   brojFakture: string; // Invoice number
   dobavljac: string; // Supplier name
   pibDobavljaca: string; // Supplier PIB/Tax ID
+  brojRacunaZaUplatu: string; // Bank account number for payment
   datumPrometa: string; // Invoice date
   datumDospeca: string; // Due date
   iznosZaPlacanje: number; // Amount to pay
@@ -14,6 +15,15 @@ export interface Invoice {
   createdBy: string; // User ID who created this
   imageUrl?: string; // Optional stored image/PDF
   notes?: string; // Optional notes
+}
+
+export interface Supplier {
+  id: string;
+  name: string; // Supplier name
+  pib: string; // Supplier PIB/Tax ID
+  brojRacuna: string; // Bank account number
+  createdAt: number;
+  updatedAt: number;
 }
 
 export interface User {

@@ -12,7 +12,7 @@ const SearchBar: React.FC<Props> = ({ value, onChange }) => {
       <span className="search-icon">🔍</span>
       <input
         type="text"
-        placeholder="Pretraži po dobavljaču..."
+        placeholder="Pretraži po dobavljaču ili broju fakture..."
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
