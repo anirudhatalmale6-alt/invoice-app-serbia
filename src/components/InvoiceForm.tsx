@@ -13,9 +13,12 @@ interface Props {
 const COMPANIES = ['Sirius Medical', 'S-Life'];
 
 const InvoiceForm: React.FC<Props> = ({ invoice, onClose }) => {
-  const { addInvoice, updateInvoice, getSupplierSuggestions, addOrUpdateSupplier } = useInvoices();
+  const { addInvoice, updateInvoice, getSupplierSuggestions, addOrUpdateSupplier, selectedCompany } = useInvoices();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeField, setActiveField] = useState<FieldType | null>(null);
+
+  // Default to selected company from header, or first company if "all" is selected
+  const defaultCompany = selectedCompany === 'all' ? COMPANIES[0] : selectedCompany;
 
   const [formData, setFormData] = useState({
     brojFakture: invoice?.brojFakture || '',
@@ -27,7 +30,7 @@ const InvoiceForm: React.FC<Props> = ({ invoice, onClose }) => {
     iznosZaPlacanje: invoice?.iznosZaPlacanje?.toString() || '',
     valuta: invoice?.valuta || 'RSD',
     status: invoice?.status || 'neplaceno',
-    kompanija: invoice?.kompanija || COMPANIES[0],
+    kompanija: invoice?.kompanija || defaultCompany,
     notes: invoice?.notes || '',
   });
 

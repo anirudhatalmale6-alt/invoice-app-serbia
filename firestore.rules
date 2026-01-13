@@ -31,5 +31,13 @@ service cloud.firestore {
       allow read: if isValidUser();
       allow write: if isValidUser();
     }
+
+    // Suppliers collection - for autocomplete
+    match /suppliers/{supplierId} {
+      allow read: if isValidUser();
+      allow create: if isValidUser();
+      allow update: if isValidUser();
+      allow delete: if isValidUser();
+    }
   }
 }
