@@ -1,0 +1,109 @@
+.storage-modal {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 450px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.storage-content {
+  padding: 24px;
+}
+
+.storage-loading {
+  text-align: center;
+  color: #6b7280;
+  padding: 40px 0;
+}
+
+.storage-stats {
+  margin-bottom: 20px;
+}
+
+.storage-bar-container {
+  height: 20px;
+  background: #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.storage-bar-fill {
+  height: 100%;
+  transition: width 0.5s ease;
+  border-radius: 10px;
+}
+
+.storage-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.storage-used {
+  font-weight: 600;
+  color: #1e3a5f;
+}
+
+.storage-percent {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.storage-files {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.storage-warning {
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  color: #92400e;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.storage-actions {
+  margin-top: 20px;
+}
+
+.delete-old-button {
+  width: 100%;
+  padding: 14px;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.delete-old-button:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.delete-old-button:disabled {
+  background: #fca5a5;
+  cursor: not-allowed;
+}
+
+.delete-result {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: #d1fae5;
+  border: 1px solid #6ee7b7;
+  border-radius: 8px;
+  color: #065f46;
+  font-size: 14px;
+  text-align: center;
+}
+
+.storage-error {
+  text-align: center;
+  color: #dc2626;
+  padding: 40px 0;
+}

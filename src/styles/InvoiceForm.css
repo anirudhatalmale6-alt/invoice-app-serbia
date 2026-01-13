@@ -293,6 +293,112 @@ form {
   cursor: not-allowed;
 }
 
+/* Attachment styles */
+.attachment-group {
+  margin-top: 8px;
+}
+
+.attachment-button {
+  width: 100%;
+  padding: 16px;
+  background: #f9fafb;
+  border: 2px dashed #d1d5db;
+  border-radius: 12px;
+  color: #6b7280;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.attachment-button:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+  color: #374151;
+}
+
+.attachment-preview {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.attachment-preview img {
+  width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  background: #f9fafb;
+}
+
+.pdf-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  background: #f9fafb;
+}
+
+.pdf-icon {
+  font-size: 32px;
+}
+
+.pdf-name {
+  font-size: 14px;
+  color: #374151;
+  word-break: break-all;
+}
+
+.attachment-actions {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  background: white;
+  border-top: 1px solid #e5e7eb;
+}
+
+.change-attachment,
+.remove-attachment {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.change-attachment {
+  background: #f0f9ff;
+  border: 1px solid #2563eb;
+  color: #2563eb;
+}
+
+.change-attachment:hover {
+  background: #e0f2fe;
+}
+
+.remove-attachment {
+  background: #fef2f2;
+  border: 1px solid #dc2626;
+  color: #dc2626;
+}
+
+.remove-attachment:hover {
+  background: #fee2e2;
+}
+
+.upload-progress {
+  margin-top: 12px;
+}
+
+.upload-progress span {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #6b7280;
+  text-align: center;
+}
+
 @media (max-width: 500px) {
   .modal-content {
     max-height: 100vh;

@@ -6,6 +6,7 @@ import InvoiceForm from '../components/InvoiceForm';
 import CompanySelector from '../components/CompanySelector';
 import SearchBar from '../components/SearchBar';
 import DueTodayCard from '../components/DueTodayCard';
+import StorageManager from '../components/StorageManager';
 import type { Invoice } from '../types';
 import '../styles/Dashboard.css';
 
@@ -16,6 +17,7 @@ const Dashboard: React.FC = () => {
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState<'all' | 'unpaid' | 'paid' | 'overdue' | 'today' | 'tomorrow'>('all');
+  const [showStorageManager, setShowStorageManager] = useState(false);
 
   const dueToday = getDueToday();
   const dueTomorrow = getDueTomorrow();
@@ -66,6 +68,9 @@ const Dashboard: React.FC = () => {
           <CompanySelector />
         </div>
         <div className="header-right">
+          <button onClick={() => setShowStorageManager(true)} className="storage-button" title="Upravljanje memorijom">
+            💾
+          </button>
           <span className="user-name">{userData?.displayName || userData?.email}</span>
           <button onClick={signOut} className="logout-button">
             Odjavi se
@@ -149,6 +154,10 @@ const Dashboard: React.FC = () => {
           invoice={editingInvoice}
           onClose={handleCloseForm}
         />
+      )}
+
+      {showStorageManager && (
+        <StorageManager onClose={() => setShowStorageManager(false)} />
       )}
     </div>
   );

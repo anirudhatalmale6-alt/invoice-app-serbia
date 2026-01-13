@@ -3,6 +3,7 @@ import { useInvoices } from '../context/InvoiceContext';
 import { performFieldOCR } from '../services/ocr';
 import type { FieldType } from '../services/ocr';
 import type { Invoice, Supplier } from '../types';
+import { uploadInvoiceAttachment } from '../services/storage';
 import CameraScanner from './CameraScanner';
 import '../styles/InvoiceForm.css';
 
@@ -50,6 +51,12 @@ const InvoiceForm: React.FC<Props> = ({ invoice, onClose }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+
+  // Attachment state
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
+  const [attachmentPreview, setAttachmentPreview] = useState<string | null>(invoice?.imageUrl || null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const attachmentInputRef = useRef<HTMLInputElement>(null);
 
   // Supplier autocomplete state
   const [supplierSuggestions, setSupplierSuggestions] = useState<Supplier[]>([]);
@@ -146,16 +153,69 @@ const InvoiceForm: React.FC<Props> = ({ invoice, onClose }) => {
     setActiveField(null);
   };
 
+  // Handle attachment file selection
+  const handleAttachmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
+    if (!validTypes.includes(file.type)) {
+      setError('Dozvoljeni formati: JPG, PNG, GIF, WEBP, PDF');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Maksimalna veličina fajla je 5MB');
+      return;
+    }
+
+    setAttachmentFile(file);
+
+    // Create preview for images
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setAttachmentPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      // PDF icon placeholder
+      setAttachmentPreview('pdf');
+    }
+  };
+
+  const removeAttachment = () => {
+    setAttachmentFile(null);
+    setAttachmentPreview(invoice?.imageUrl || null);
+    if (attachmentInputRef.current) {
+      attachmentInputRef.current.value = '';
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     setError('');
 
     try {
+      let imageUrl = invoice?.imageUrl || '';
+
+      // Upload attachment if new file selected
+      if (attachmentFile) {
+        setUploadProgress(10);
+        // Generate temporary ID for new invoices
+        const tempId = invoice?.id || `temp_${Date.now()}`;
+        imageUrl = await uploadInvoiceAttachment(tempId, attachmentFile, setUploadProgress);
+        setUploadProgress(100);
+      }
+
       const invoiceData = {
         ...formData,
         iznosZaPlacanje: parseFloat(formData.iznosZaPlacanje.replace(',', '.')) || 0,
         status: formData.status as 'placeno' | 'neplaceno',
+        imageUrl,
       };
 
       if (invoice) {
@@ -178,6 +238,7 @@ const InvoiceForm: React.FC<Props> = ({ invoice, onClose }) => {
       setError('Greška pri čuvanju fakture. Pokušajte ponovo.');
     } finally {
       setSaving(false);
+      setUploadProgress(0);
     }
   };
 
@@ -368,6 +429,63 @@ const InvoiceForm: React.FC<Props> = ({ invoice, onClose }) => {
               placeholder="Dodatne napomene..."
               rows={3}
             />
+          </div>
+
+          <div className="form-group attachment-group">
+            <label>Prilog (slika ili PDF fakture)</label>
+            <input
+              type="file"
+              ref={attachmentInputRef}
+              accept="image/*,application/pdf"
+              onChange={handleAttachmentChange}
+              style={{ display: 'none' }}
+            />
+
+            {!attachmentPreview ? (
+              <button
+                type="button"
+                className="attachment-button"
+                onClick={() => attachmentInputRef.current?.click()}
+              >
+                📎 Dodaj prilog
+              </button>
+            ) : (
+              <div className="attachment-preview">
+                {attachmentPreview === 'pdf' ? (
+                  <div className="pdf-preview">
+                    <span className="pdf-icon">📄</span>
+                    <span className="pdf-name">{attachmentFile?.name || 'PDF dokument'}</span>
+                  </div>
+                ) : (
+                  <img src={attachmentPreview} alt="Prilog" />
+                )}
+                <div className="attachment-actions">
+                  <button
+                    type="button"
+                    className="change-attachment"
+                    onClick={() => attachmentInputRef.current?.click()}
+                  >
+                    Promijeni
+                  </button>
+                  <button
+                    type="button"
+                    className="remove-attachment"
+                    onClick={removeAttachment}
+                  >
+                    Ukloni
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {uploadProgress > 0 && uploadProgress < 100 && (
+              <div className="upload-progress">
+                <div className="progress-bar">
+                  <div className="progress" style={{ width: `${uploadProgress}%` }}></div>
+                </div>
+                <span>Upload: {uploadProgress}%</span>
+              </div>
+            )}
           </div>
 
           <div className="form-actions">
